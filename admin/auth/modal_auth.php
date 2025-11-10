@@ -38,15 +38,15 @@ try {
     }
 
     // Cari user di database berdasarkan username
-    $stmt = $pdo->prepare("SELECT * FROM admin WHERE username = ?");
+    $stmt = $pdo->prepare("SELECT * FROM user WHERE username = ?");
     $stmt->execute([$username]);
-    $admin = $stmt->fetch();
+    $user = $stmt->fetch();
 
     // Verifikasi user dan password
-    if ($admin && password_verify($password, $admin['password'])) {
+    if ($user && password_verify($password, $user['password'])) {
         // Login berhasil - simpan ke session
-        $_SESSION['admin_id'] = $admin['id'];
-        $_SESSION['admin_username'] = $admin['username'];
+        $_SESSION['user_id'] = $user['id'];
+        $_SESSION['user_username'] = $user['username'];
 
         // Generate new CSRF token untuk security
         $_SESSION['csrf_token'] = bin2hex(random_bytes(32));

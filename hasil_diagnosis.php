@@ -1,6 +1,9 @@
 <?php
 // Selalu mulai session di awal untuk mengakses data hasil
-session_start();
+// session_start();
+
+// Panggil header
+require_once 'templates/header.php';
 
 // Cek apakah ada hasil diagnosa di session. Jika tidak, redirect ke halaman diagnosis.
 if (!isset($_SESSION['hasil_diagnosa'])) {
@@ -19,8 +22,6 @@ if (isset($hasil['tinggi_badan'])) {
     $bb_ideal = ($hasil['tinggi_badan'] - 100) * 0.9;
 }
 
-// Panggil header
-require_once 'templates/header.php';
 ?>
 
 <div class="card shadow-sm">

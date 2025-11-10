@@ -3,7 +3,7 @@ if (!isset($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
-$isAdminLoggedIn = isset($_SESSION['admin_id']);
+$isUserLoggedIn = isset($_SESSION['user_id']);
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -66,8 +66,8 @@ $isAdminLoggedIn = isset($_SESSION['admin_id']);
                 </ul>
 
                 <div class="d-flex align-items-center">
-                    <?php if ($isAdminLoggedIn): ?>
-                        <!-- Dropdown untuk admin yang sudah login -->
+                    <?php if ($isUserLoggedIn): ?>
+                        <!-- Dropdown untuk user yang sudah login -->
                         <div class="dropdown">
                             <button class="btn btn-dashboard dropdown-toggle" type="button" data-bs-toggle="dropdown"
                                 aria-expanded="false">
@@ -110,14 +110,14 @@ $isAdminLoggedIn = isset($_SESSION['admin_id']);
         </div>
     </nav>
 
-    <!-- Modal Login Admin -->
-    <?php if (!$isAdminLoggedIn): ?>
+    <!-- Modal Login user -->
+    <?php if (!$isUserLoggedIn): ?>
         <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content shadow-lg">
                     <div class="modal-header text-white">
                         <h1 class="modal-title fs-5" id="loginModalLabel">
-                            <i class="bi bi-shield-lock me-2"></i>Login Admin
+                            <i class="bi bi-shield-lock me-2"></i>Login
                         </h1>
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
                             aria-label="Close"></button>
@@ -129,23 +129,23 @@ $isAdminLoggedIn = isset($_SESSION['admin_id']);
                             <span id="loginAlertMessage"></span>
                         </div>
 
-                        <form id="adminLoginForm" method="POST">
+                        <form id="userLoginForm" method="POST">
                             <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
                             <input type="hidden" name="ajax_login" value="1">
 
                             <div class="mb-3">
-                                <label for="adminUsername" class="form-label fw-semibold">Username</label>
+                                <label for="userUsername" class="form-label fw-semibold">Username</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="bi bi-person"></i></span>
-                                    <input type="text" class="form-control" id="adminUsername" name="username" required
-                                        placeholder="Masukkan username admin">
+                                    <input type="text" class="form-control" id="userUsername" name="username" required
+                                        placeholder="Masukkan username user">
                                 </div>
                             </div>
                             <div class="mb-4">
-                                <label for="adminPassword" class="form-label fw-semibold">Password</label>
+                                <label for="userPassword" class="form-label fw-semibold">Password</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="bi bi-lock"></i></span>
-                                    <input type="password" class="form-control" id="adminPassword" name="password" required
+                                    <input type="password" class="form-control" id="userPassword" name="password" required
                                         placeholder="Masukkan password">
                                     <button class="btn btn-outline-secondary" type="button" id="togglePassword">
                                         <i class="bi bi-eye"></i>

@@ -1,6 +1,6 @@
 <?php
 $host = 'localhost';
-$db_name = 'db_gizi_ideal';
+$db_name = 'db_diagnosis_gizi';
 $username = 'root';
 $password = '';
 

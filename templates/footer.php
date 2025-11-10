@@ -41,127 +41,127 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Toggle password visibility
-        document.getElementById('togglePassword')?.addEventListener('click', function() {
-            const password = document.getElementById('adminPassword');
-            const icon = this.querySelector('i');
+// Toggle password visibility
+document.getElementById('togglePassword')?.addEventListener('click', function() {
+    const password = document.getElementById('userPassword');
+    const icon = this.querySelector('i');
 
-            if (password.type === 'password') {
-                password.type = 'text';
-                icon.classList.remove('bi-eye');
-                icon.classList.add('bi-eye-slash');
+    if (password.type === 'password') {
+        password.type = 'text';
+        icon.classList.remove('bi-eye');
+        icon.classList.add('bi-eye-slash');
+    } else {
+        password.type = 'password';
+        icon.classList.remove('bi-eye-slash');
+        icon.classList.add('bi-eye');
+    }
+});
+
+// Handle AJAX login form
+document.getElementById('userLoginForm')?.addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const formData = new FormData(this);
+    const loginBtn = document.getElementById('loginBtn');
+    const loginAlert = document.getElementById('loginAlert');
+    const loginAlertMessage = document.getElementById('loginAlertMessage');
+
+    // Disable button dan ubah text
+    loginBtn.disabled = true;
+    loginBtn.innerHTML = '<i class="spinner-border spinner-border-sm me-2"></i>Loading...';
+
+    // Hide alert
+    loginAlert.classList.add('d-none');
+
+    fetch('admin/auth/modal_auth.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Login berhasil
+                loginAlertMessage.textContent = 'Login berhasil! Redirecting...';
+                loginAlert.classList.remove('alert-danger');
+                loginAlert.classList.add('alert-success');
+                loginAlert.classList.remove('d-none');
+
+                // Redirect setelah 1 detik
+                setTimeout(() => {
+                    window.location.href = data.redirect;
+                }, 1000);
             } else {
-                password.type = 'password';
-                icon.classList.remove('bi-eye-slash');
-                icon.classList.add('bi-eye');
+                // Login gagal
+                loginAlertMessage.textContent = data.message || 'Username atau password salah!';
+                loginAlert.classList.remove('alert-success');
+                loginAlert.classList.add('alert-danger');
+                loginAlert.classList.remove('d-none');
             }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            loginAlertMessage.textContent = 'Terjadi kesalahan sistem!';
+            loginAlert.classList.remove('alert-success');
+            loginAlert.classList.add('alert-danger');
+            loginAlert.classList.remove('d-none');
+        })
+        .finally(() => {
+            // Re-enable button
+            loginBtn.disabled = false;
+            loginBtn.innerHTML = '<i class="bi bi-box-arrow-in-right me-2"></i>Login';
         });
+});
 
-        // Handle AJAX login form
-        document.getElementById('adminLoginForm')?.addEventListener('submit', function(e) {
-            e.preventDefault();
-
-            const formData = new FormData(this);
-            const loginBtn = document.getElementById('loginBtn');
-            const loginAlert = document.getElementById('loginAlert');
-            const loginAlertMessage = document.getElementById('loginAlertMessage');
-
-            // Disable button dan ubah text
-            loginBtn.disabled = true;
-            loginBtn.innerHTML = '<i class="spinner-border spinner-border-sm me-2"></i>Loading...';
-
-            // Hide alert
-            loginAlert.classList.add('d-none');
-
-            fetch('admin/auth/modal_auth.php', {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        // Login berhasil
-                        loginAlertMessage.textContent = 'Login berhasil! Redirecting...';
-                        loginAlert.classList.remove('alert-danger');
-                        loginAlert.classList.add('alert-success');
-                        loginAlert.classList.remove('d-none');
-
-                        // Redirect setelah 1 detik
-                        setTimeout(() => {
-                            window.location.href = data.redirect;
-                        }, 1000);
-                    } else {
-                        // Login gagal
-                        loginAlertMessage.textContent = data.message || 'Username atau password salah!';
-                        loginAlert.classList.remove('alert-success');
-                        loginAlert.classList.add('alert-danger');
-                        loginAlert.classList.remove('d-none');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    loginAlertMessage.textContent = 'Terjadi kesalahan sistem!';
-                    loginAlert.classList.remove('alert-success');
-                    loginAlert.classList.add('alert-danger');
-                    loginAlert.classList.remove('d-none');
-                })
-                .finally(() => {
-                    // Re-enable button
-                    loginBtn.disabled = false;
-                    loginBtn.innerHTML = '<i class="bi bi-box-arrow-in-right me-2"></i>Login';
-                });
-        });
-
-        // Auto close navbar on mobile when clicking a link
-        document.querySelectorAll('.navbar-nav .nav-link').forEach(link => {
-            link.addEventListener('click', () => {
-                if (window.innerWidth < 992) {
-                    const navbarCollapse = document.getElementById('navbarNav');
-                    const bsCollapse = new bootstrap.Collapse(navbarCollapse, {
-                        toggle: false
-                    });
-                    bsCollapse.hide();
-                }
+// Auto close navbar on mobile when clicking a link
+document.querySelectorAll('.navbar-nav .nav-link').forEach(link => {
+    link.addEventListener('click', () => {
+        if (window.innerWidth < 992) {
+            const navbarCollapse = document.getElementById('navbarNav');
+            const bsCollapse = new bootstrap.Collapse(navbarCollapse, {
+                toggle: false
             });
-        });
+            bsCollapse.hide();
+        }
+    });
+});
 
-        // Add active class to current page nav link
-        document.addEventListener('DOMContentLoaded', function() {
-            const currentPage = window.location.pathname.split('/').pop();
-            const navLinks = document.querySelectorAll('.navbar-nav .nav-link');
+// Add active class to current page nav link
+document.addEventListener('DOMContentLoaded', function() {
+    const currentPage = window.location.pathname.split('/').pop();
+    const navLinks = document.querySelectorAll('.navbar-nav .nav-link');
 
-            navLinks.forEach(link => {
-                const href = link.getAttribute('href');
-                if (href === currentPage || (currentPage === '' && href === 'index.php')) {
-                    link.classList.add('active');
-                }
+    navLinks.forEach(link => {
+        const href = link.getAttribute('href');
+        if (href === currentPage || (currentPage === '' && href === 'index.php')) {
+            link.classList.add('active');
+        }
+    });
+});
+
+// Smooth scrolling for anchor links
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function(e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+            target.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
             });
-        });
+        }
+    });
+});
 
-        // Smooth scrolling for anchor links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function(e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                }
-            });
-        });
+// Footer link hover effects
+document.querySelectorAll('footer a').forEach(link => {
+    link.addEventListener('mouseenter', function() {
+        this.style.color = '#20c997';
+    });
 
-        // Footer link hover effects
-        document.querySelectorAll('footer a').forEach(link => {
-            link.addEventListener('mouseenter', function() {
-                this.style.color = '#20c997';
-            });
-
-            link.addEventListener('mouseleave', function() {
-                this.style.color = '#28a745';
-            });
-        });
+    link.addEventListener('mouseleave', function() {
+        this.style.color = '#28a745';
+    });
+});
     </script>
     </body>
 

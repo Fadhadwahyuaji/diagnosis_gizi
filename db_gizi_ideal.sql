@@ -24,20 +24,20 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `admin`
+-- Struktur dari tabel `user`
 --
 
-CREATE TABLE `admin` (
+CREATE TABLE `user` (
   `id` int(11) NOT NULL,
   `username` varchar(50) NOT NULL,
   `password` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data untuk tabel `admin`
+-- Dumping data untuk tabel `user`
 --
 
-INSERT INTO `admin` (`id`, `username`, `password`) VALUES
+INSERT INTO `user` (`id`, `username`, `password`) VALUES
 (1, 'admin', '$2y$10$QastnfKJcQvq0c5hFxR.D.mQOVQnyEEKeHnj7YcpgNs1eNEMzgqWC'),
 (2, 'admin2', '12345');
 
@@ -138,26 +138,59 @@ CREATE TABLE `pengetahuan` (
   `cf_pakar` decimal(3,2) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+
 --
 -- Dumping data untuk tabel `pengetahuan`
 --
-
 INSERT INTO `pengetahuan` (`id`, `gejala_id`, `status_gizi_id`, `cf_pakar`) VALUES
+-- R1: IF G01 THEN S1 (CF=1.0)
 (1, 1, 1, 1.00),
+-- R2: IF G02 THEN S2 (CF=1.0)
 (2, 2, 2, 1.00),
+-- R3: IF G03 THEN S3 (CF=1.0)
 (3, 3, 3, 1.00),
+-- R4: IF G04 THEN S4 (CF=1.0)
 (4, 4, 4, 1.00),
-(5, 5, 4, 0.90),
-(6, 6, 4, 0.90),
-(7, 9, 2, 0.90),
-(8, 14, 2, 0.50),
-(9, 15, 1, 0.60),
-(10, 17, 1, 0.60),
-(11, 18, 4, 0.90),
-(12, 19, 4, 0.80),
-(13, 21, 4, 1.00),
-(14, 22, 4, 0.90),
-(15, 24, 1, 0.40);
+-- R5: IF G18 THEN S4 (CF=0.9) - Sering fast food → Obesitas
+(5, 18, 4, 0.90),
+-- R6: IF G17 THEN S1 (CF=0.6) - Jarang sayur → Gizi Kurang
+(6, 17, 1, 0.60),
+-- R7: IF G14 THEN S2 (CF=0.5) - Sering buah → Normal
+(7, 14, 2, 0.50),
+-- R8: IF G06 THEN S4 (CF=0.9) - Jarang olahraga → Obesitas
+(8, 6, 4, 0.90),
+-- R9: IF G09 THEN S2 (CF=0.9) - Olahraga rutin → Normal
+(9, 9, 2, 0.90),
+-- R10: IF G22 THEN S4 (CF=0.9) - Hipertensi → Obesitas
+(10, 22, 4, 0.90),
+-- R11: IF G21 THEN S4 (CF=1.0) - Diabetes → Obesitas
+(11, 21, 4, 1.00),
+-- R12: IF G24 THEN S1 (CF=0.4) - Maag → Gizi Kurang
+(12, 24, 1, 0.40),
+-- R13: IF G05 THEN S4 (CF=0.9) - Tidak pernah olahraga → Obesitas
+(13, 5, 4, 0.90),
+-- R14: IF G15 THEN S1 (CF=0.6) - Jarang buah → Gizi Kurang
+(14, 15, 1, 0.60),
+-- R15: IF G19 THEN S4 (CF=0.8) - Sering minuman manis → Obesitas
+(15, 19, 4, 0.80);
+
+-- old
+-- INSERT INTO `pengetahuan` (`id`, `gejala_id`, `status_gizi_id`, `cf_pakar`) VALUES
+-- (1, 1, 1, 1.00),
+-- (2, 2, 2, 1.00),
+-- (3, 3, 3, 1.00),
+-- (4, 4, 4, 1.00),
+-- (5, 5, 4, 0.90),
+-- (6, 6, 4, 0.90),
+-- (7, 9, 2, 0.90),
+-- (8, 14, 2, 0.50),
+-- (9, 15, 1, 0.60),
+-- (10, 17, 1, 0.60),
+-- (11, 18, 4, 0.90),
+-- (12, 19, 4, 0.80),
+-- (13, 21, 4, 1.00),
+-- (14, 22, 4, 0.90),
+-- (15, 24, 1, 0.40);
 
 -- --------------------------------------------------------
 
@@ -284,20 +317,26 @@ CREATE TABLE `status_gizi` (
 -- Dumping data untuk tabel `status_gizi`
 --
 
-INSERT INTO `status_gizi` (`id`, `kode_status`, `nama_status`, `deskripsi`) VALUES
-(1, 'S1', 'Gizi Kurang', 'IMT < 18,5'),
-(2, 'S2', 'Normal', 'IMT 18,5 - 24,9'),
-(3, 'S3', 'Gizi Lebih', 'IMT 25,0 - 29,9'),
-(4, 'S4', 'Obesitas', 'IMT >= 30,0');
+INSERT INTO `status_gizi` (`id`, `kode_status`, `nama_status`) VALUES
+(1, 'S1', 'Gizi Kurang'),
+(2, 'S2', 'Normal'),
+(3, 'S3', 'Gizi Lebih'),
+(4, 'S4', 'Obesitas');
+
+-- INSERT INTO `status_gizi` (`id`, `kode_status`, `nama_status`, `deskripsi`) VALUES
+-- (1, 'S1', 'Gizi Kurang', 'IMT < 18,5'),
+-- (2, 'S2', 'Normal', 'IMT 18,5 - 24,9'),
+-- (3, 'S3', 'Gizi Lebih', 'IMT 25,0 - 29,9'),
+-- (4, 'S4', 'Obesitas', 'IMT >= 30,0');
 
 --
 -- Indexes for dumped tables
 --
 
 --
--- Indeks untuk tabel `admin`
+-- Indeks untuk tabel `user`
 --
-ALTER TABLE `admin`
+ALTER TABLE `user`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `username` (`username`);
 
@@ -355,9 +394,9 @@ ALTER TABLE `status_gizi`
 --
 
 --
--- AUTO_INCREMENT untuk tabel `admin`
+-- AUTO_INCREMENT untuk tabel `user`
 --
-ALTER TABLE `admin`
+ALTER TABLE `user`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --

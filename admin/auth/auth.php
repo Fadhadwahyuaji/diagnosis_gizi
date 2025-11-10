@@ -27,18 +27,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // 1. Cari user di database berdasarkan username
     try {
-        $stmt = $pdo->prepare("SELECT * FROM admin WHERE username = ?");
+        $stmt = $pdo->prepare("SELECT * FROM user WHERE username = ?");
         $stmt->execute([$username]);
-        $admin = $stmt->fetch();
+        $user = $stmt->fetch();
 
         // 2. Verifikasi user dan password
-        // Cek apakah admin ditemukan DAN password cocok dengan hash di database
-        if ($admin && password_verify($password, $admin['password'])) {
+        // Cek apakah user ditemukan DAN password cocok dengan hash di database
+        if ($user && password_verify($password, $user['password'])) {
 
             // Jika berhasil login:
-            // a. Simpan informasi admin ke session
-            $_SESSION['admin_id'] = $admin['id'];
-            $_SESSION['admin_username'] = $admin['username'];
+            // a. Simpan informasi user ke session
+            $_SESSION['user_id'] = $user['id'];
+            $_SESSION['user_username'] = $user['username'];
 
             // b. Redirect ke halaman dashboard
             header("Location: ../dashboard.php");
