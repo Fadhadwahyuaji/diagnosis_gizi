@@ -1,0 +1,12 @@
+{
+  "intelephense.environment.phpVersion": "8.3",
+  "fiveServer.php.executable": "C:\\xampp\\php\\php.exe",
+  "php-intellisense.trace.server": "messages",
+  "livePreview.portNumber": 5500,
+  "php.executablePath": "",
+  "liveServer.settings.proxy": {
+    "enable": true,
+    "baseUri": "/",
+    "proxyUri": "http://localhost:8000"
+  }
+}
