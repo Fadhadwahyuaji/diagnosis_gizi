@@ -1,6 +1,8 @@
 <?php
-require_once 'auth/auth_check.php';
-require_once '../config/databases.php';
+require_once __DIR__ . '/../auth/auth_check.php';
+require_once __DIR__ . '/../config/databases.php';
+require_once __DIR__ . '/../middleware/role_guard.php';
+requireAdmin();
 
 // Logika untuk menangani Aksi (Create, Update, Delete)
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -36,10 +38,11 @@ $stmt = $pdo->query("
 ");
 $rekomendasi_data = $stmt->fetchAll();
 
-require_once 'templates/header.php';
+require_once __DIR__ . '/../templates/admin/header.php';
 ?>
 
-<div class="container-fluid bg-white p-4" style="min-height: 100vh;">
+<!-- Content wrapper with proper spacing -->
+<div class="container-fluid p-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="text-dark">Manajemen Rekomendasi</h2>
         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalTambah">
@@ -113,6 +116,7 @@ require_once 'templates/header.php';
         </div>
     </div>
 </div>
+<!-- End content wrapper -->
 
 <!-- Modal Tambah Rekomendasi -->
 <div class="modal fade" id="modalTambah" tabindex="-1" aria-labelledby="modalTambahLabel" aria-hidden="true">
@@ -230,5 +234,5 @@ require_once 'templates/header.php';
 </script>
 
 <?php
-require_once 'templates/footer.php';
+require_once __DIR__ . '/../templates/admin/footer.php';
 ?>

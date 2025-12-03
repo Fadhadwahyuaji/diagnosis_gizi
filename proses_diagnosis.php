@@ -1,7 +1,7 @@
 <?php
 // filepath: d:\PROYEK\diagnosis_gizi\proses_diagnosis.php
 session_start();
-require_once 'config/databases.php';
+require_once __DIR__ . '/config/databases.php';
 
 // =================================================================
 // FUNGSI-FUNGSI CF SESUAI DOKUMEN
@@ -27,13 +27,16 @@ function getCFUser($tingkat_keyakinan = 'yakin')
  */
 function CFcombine($cf1, $cf2)
 {
+    // Kasus B (kedua negatif): CF12 = CF1 + CF2 * (1 + CF1)
     if ($cf1 >= 0 && $cf2 >= 0) {
         return $cf1 + $cf2 * (1 - $cf1);
     }
 
+    // Kasus C (satu positif, satu negatif): CF12 = (CF1 + CF2) / (1 - min(|CF1|, |CF2|))
     if ($cf1 < 0 && $cf2 < 0) {
         return $cf1 + $cf2 * (1 + $cf1);
     }
+
 
     $numerator = $cf1 + $cf2;
     $denominator = 1 - min(abs($cf1), abs($cf2));

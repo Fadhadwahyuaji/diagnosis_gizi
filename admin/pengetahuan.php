@@ -1,6 +1,8 @@
 <?php
-require_once 'auth/auth_check.php';
-require_once '../config/databases.php';
+require_once __DIR__ . '/../auth/auth_check.php';
+require_once __DIR__ . '/../config/databases.php';
+require_once __DIR__ . '/../middleware/role_guard.php';
+requireAdmin();
 
 // Logika untuk menangani Aksi (Create, Update, Delete)
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -36,10 +38,11 @@ $stmt = $pdo->query("
 ");
 $rules_data = $stmt->fetchAll();
 
-require_once 'templates/header.php';
+require_once __DIR__ . '/../templates/admin/header.php';
 ?>
 
-<div class="container-fluid bg-white p-4" style="min-height: 100vh;">
+<!-- Content wrapper with proper spacing -->
+<div class="container-fluid p-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="text-dark">Manajemen Pengetahuan (Rules)</h2>
         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalTambah">
@@ -63,46 +66,46 @@ require_once 'templates/header.php';
                     </thead>
                     <tbody>
                         <?php if (empty($rules_data)) : ?>
-                        <tr>
-                            <td colspan="6" class="text-center py-4 text-muted">
-                                <i class="bi bi-inbox" style="font-size: 2rem;"></i>
-                                <p class="mt-2">Tidak ada data</p>
-                            </td>
-                        </tr>
+                            <tr>
+                                <td colspan="6" class="text-center py-4 text-muted">
+                                    <i class="bi bi-inbox" style="font-size: 2rem;"></i>
+                                    <p class="mt-2">Tidak ada data</p>
+                                </td>
+                            </tr>
                         <?php else : ?>
-                        <?php foreach ($rules_data as $index => $rule) : ?>
-                        <tr>
-                            <td class="text-center"><?php echo $index + 1; ?></td>
-                            <td><span
-                                    class="badge bg-secondary"><?php echo htmlspecialchars($rule['kode_gejala']); ?></span>
-                            </td>
-                            <td><?php echo htmlspecialchars($rule['nama_gejala']); ?></td>
-                            <td><?php echo htmlspecialchars($rule['nama_status']); ?></td>
-                            <td class="text-center"><span
-                                    class="badge bg-success"><?php echo htmlspecialchars($rule['cf_pakar']); ?></span>
-                            </td>
-                            <td class="text-center">
-                                <div class="btn-group" role="group">
-                                    <button type="button" class="btn btn-sm btn-warning" data-bs-toggle="modal"
-                                        data-bs-target="#modalEdit" data-id="<?php echo $rule['id']; ?>"
-                                        data-gejala="<?php echo $rule['gejala_id']; ?>"
-                                        data-status="<?php echo $rule['status_gizi_id']; ?>"
-                                        data-cf="<?php echo $rule['cf_pakar']; ?>">
-                                        <i class="bi bi-pencil"></i> Edit
-                                    </button>
-                                    <button type="button" class="btn btn-sm btn-danger"
-                                        onclick="if(confirm('Yakin hapus aturan ini?')) { document.getElementById('delete-form-<?php echo $rule['id']; ?>').submit(); }">
-                                        <i class="bi bi-trash"></i> Hapus
-                                    </button>
-                                </div>
-                                <form id="delete-form-<?php echo $rule['id']; ?>" action="pengetahuan.php" method="POST"
-                                    style="display: none;">
-                                    <input type="hidden" name="id" value="<?php echo $rule['id']; ?>">
-                                    <input type="hidden" name="hapus" value="1">
-                                </form>
-                            </td>
-                        </tr>
-                        <?php endforeach; ?>
+                            <?php foreach ($rules_data as $index => $rule) : ?>
+                                <tr>
+                                    <td class="text-center"><?php echo $index + 1; ?></td>
+                                    <td><span
+                                            class="badge bg-secondary"><?php echo htmlspecialchars($rule['kode_gejala']); ?></span>
+                                    </td>
+                                    <td><?php echo htmlspecialchars($rule['nama_gejala']); ?></td>
+                                    <td><?php echo htmlspecialchars($rule['nama_status']); ?></td>
+                                    <td class="text-center"><span
+                                            class="badge bg-success"><?php echo htmlspecialchars($rule['cf_pakar']); ?></span>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="btn-group" role="group">
+                                            <button type="button" class="btn btn-sm btn-warning" data-bs-toggle="modal"
+                                                data-bs-target="#modalEdit" data-id="<?php echo $rule['id']; ?>"
+                                                data-gejala="<?php echo $rule['gejala_id']; ?>"
+                                                data-status="<?php echo $rule['status_gizi_id']; ?>"
+                                                data-cf="<?php echo $rule['cf_pakar']; ?>">
+                                                <i class="bi bi-pencil"></i> Edit
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-danger"
+                                                onclick="if(confirm('Yakin hapus aturan ini?')) { document.getElementById('delete-form-<?php echo $rule['id']; ?>').submit(); }">
+                                                <i class="bi bi-trash"></i> Hapus
+                                            </button>
+                                        </div>
+                                        <form id="delete-form-<?php echo $rule['id']; ?>" action="pengetahuan.php" method="POST"
+                                            style="display: none;">
+                                            <input type="hidden" name="id" value="<?php echo $rule['id']; ?>">
+                                            <input type="hidden" name="hapus" value="1">
+                                        </form>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
                         <?php endif; ?>
                     </tbody>
                 </table>
@@ -110,6 +113,7 @@ require_once 'templates/header.php';
         </div>
     </div>
 </div>
+<!-- End content wrapper -->
 
 <!-- Modal Tambah Pengetahuan -->
 <div class="modal fade" id="modalTambah" tabindex="-1" aria-labelledby="modalTambahLabel" aria-hidden="true">
@@ -128,9 +132,9 @@ require_once 'templates/header.php';
                         <select class="form-select" id="gejala_id_tambah" name="gejala_id" required>
                             <option value="">-- Pilih Gejala --</option>
                             <?php foreach ($all_gejala as $gejala) : ?>
-                            <option value="<?php echo $gejala['id']; ?>">
-                                <?php echo htmlspecialchars($gejala['kode_gejala'] . ' - ' . $gejala['nama_gejala']); ?>
-                            </option>
+                                <option value="<?php echo $gejala['id']; ?>">
+                                    <?php echo htmlspecialchars($gejala['kode_gejala'] . ' - ' . $gejala['nama_gejala']); ?>
+                                </option>
                             <?php endforeach; ?>
                         </select>
                     </div>
@@ -140,9 +144,9 @@ require_once 'templates/header.php';
                         <select class="form-select" id="status_gizi_id_tambah" name="status_gizi_id" required>
                             <option value="">-- Pilih Status Gizi --</option>
                             <?php foreach ($all_status as $status) : ?>
-                            <option value="<?php echo $status['id']; ?>">
-                                <?php echo htmlspecialchars($status['nama_status']); ?>
-                            </option>
+                                <option value="<?php echo $status['id']; ?>">
+                                    <?php echo htmlspecialchars($status['nama_status']); ?>
+                                </option>
                             <?php endforeach; ?>
                         </select>
                     </div>
@@ -182,9 +186,9 @@ require_once 'templates/header.php';
                         <select class="form-select" id="gejala_id_edit" name="gejala_id" required>
                             <option value="">-- Pilih Gejala --</option>
                             <?php foreach ($all_gejala as $gejala) : ?>
-                            <option value="<?php echo $gejala['id']; ?>">
-                                <?php echo htmlspecialchars($gejala['kode_gejala'] . ' - ' . $gejala['nama_gejala']); ?>
-                            </option>
+                                <option value="<?php echo $gejala['id']; ?>">
+                                    <?php echo htmlspecialchars($gejala['kode_gejala'] . ' - ' . $gejala['nama_gejala']); ?>
+                                </option>
                             <?php endforeach; ?>
                         </select>
                     </div>
@@ -194,9 +198,9 @@ require_once 'templates/header.php';
                         <select class="form-select" id="status_gizi_id_edit" name="status_gizi_id" required>
                             <option value="">-- Pilih Status Gizi --</option>
                             <?php foreach ($all_status as $status) : ?>
-                            <option value="<?php echo $status['id']; ?>">
-                                <?php echo htmlspecialchars($status['nama_status']); ?>
-                            </option>
+                                <option value="<?php echo $status['id']; ?>">
+                                    <?php echo htmlspecialchars($status['nama_status']); ?>
+                                </option>
                             <?php endforeach; ?>
                         </select>
                     </div>
@@ -220,16 +224,16 @@ require_once 'templates/header.php';
 </div>
 
 <script>
-const modalEdit = document.getElementById('modalEdit');
-modalEdit.addEventListener('show.bs.modal', function(event) {
-    const button = event.relatedTarget;
-    document.getElementById('edit_id').value = button.getAttribute('data-id');
-    document.getElementById('gejala_id_edit').value = button.getAttribute('data-gejala');
-    document.getElementById('status_gizi_id_edit').value = button.getAttribute('data-status');
-    document.getElementById('cf_pakar_edit').value = button.getAttribute('data-cf');
-});
+    const modalEdit = document.getElementById('modalEdit');
+    modalEdit.addEventListener('show.bs.modal', function(event) {
+        const button = event.relatedTarget;
+        document.getElementById('edit_id').value = button.getAttribute('data-id');
+        document.getElementById('gejala_id_edit').value = button.getAttribute('data-gejala');
+        document.getElementById('status_gizi_id_edit').value = button.getAttribute('data-status');
+        document.getElementById('cf_pakar_edit').value = button.getAttribute('data-cf');
+    });
 </script>
 
 <?php
-require_once 'templates/footer.php';
+require_once __DIR__ . '/../templates/admin/footer.php';
 ?>

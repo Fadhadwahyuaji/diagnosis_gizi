@@ -1,6 +1,6 @@
 /* PENGGUNA UMUM  */
 
-body {
+    body {
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         background-color: #f8f9fa;
     }
@@ -234,3 +234,50 @@ body {
             padding-right: 1rem;
         }
     }
+
+/* ===================================
+   ADMIN & SUPERADMIN AREA STYLES
+   =================================== */
+
+/* Prevent content from being hidden behind fixed navbar */
+.admin-layout,
+.superadmin-layout {
+    padding-top: 80px; /* Height of fixed navbar */
+}
+
+/* Card and table improvements for admin area */
+.admin-content-wrapper {
+    background-color: #f8f9fa;
+    min-height: calc(100vh - 80px);
+}
+
+/* Ensure buttons and interactive elements are visible */
+.admin-header-section {
+    margin-bottom: 1.5rem;
+    padding: 1rem 0;
+    position: relative;
+    z-index: 1;
+}
+
+/* Table container spacing */
+.admin-table-wrapper {
+    margin-top: 1rem;
+    overflow-x: auto;
+}
+
+/* Responsive admin content */
+@media (max-width: 991.98px) {
+    .admin-layout,
+    .superadmin-layout {
+        padding-top: 70px;
+    }
+}
+
+/* Fix for modal z-index */
+.modal {
+    z-index: 1055 !important;
+}
+
+.modal-backdrop {
+    z-index: 1050 !important;
+}

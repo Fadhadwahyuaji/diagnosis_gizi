@@ -1,6 +1,8 @@
 <?php
-require_once 'auth/auth_check.php';
-require_once '../config/databases.php';
+require_once __DIR__ . '/../auth/auth_check.php';
+require_once __DIR__ . '/../config/databases.php';
+require_once __DIR__ . '/../middleware/role_guard.php';
+requireAdmin();
 
 // Logika untuk Aksi (Create, Update, Delete)
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -27,10 +29,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $stmt = $pdo->query("SELECT * FROM halaman_informasi ORDER BY urutan ASC");
 $info_data = $stmt->fetchAll();
 
-require_once 'templates/header.php';
+require_once __DIR__ . '/../templates/admin/header.php';
 ?>
 
-<div class="container-fluid bg-white p-4" style="min-height: 100vh;">
+<!-- Content wrapper with proper spacing -->
+<div class="container-fluid p-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="text-dark">Manajemen Halaman Informasi</h2>
         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalTambah">
@@ -51,41 +54,41 @@ require_once 'templates/header.php';
                     </thead>
                     <tbody>
                         <?php if (empty($info_data)) : ?>
-                        <tr>
-                            <td colspan="3" class="text-center py-4 text-muted">
-                                <i class="bi bi-inbox" style="font-size: 2rem;"></i>
-                                <p class="mt-2">Tidak ada data</p>
-                            </td>
-                        </tr>
+                            <tr>
+                                <td colspan="3" class="text-center py-4 text-muted">
+                                    <i class="bi bi-inbox" style="font-size: 2rem;"></i>
+                                    <p class="mt-2">Tidak ada data</p>
+                                </td>
+                            </tr>
                         <?php else : ?>
-                        <?php foreach ($info_data as $info) : ?>
-                        <tr>
-                            <td class="text-center"><span
-                                    class="badge bg-secondary"><?php echo htmlspecialchars($info['urutan']); ?></span>
-                            </td>
-                            <td><?php echo htmlspecialchars($info['judul']); ?></td>
-                            <td class="text-center">
-                                <div class="btn-group" role="group">
-                                    <button type="button" class="btn btn-sm btn-warning" data-bs-toggle="modal"
-                                        data-bs-target="#modalEdit" data-id="<?php echo $info['id']; ?>"
-                                        data-judul="<?php echo htmlspecialchars($info['judul']); ?>"
-                                        data-konten="<?php echo htmlspecialchars($info['konten']); ?>"
-                                        data-urutan="<?php echo $info['urutan']; ?>">
-                                        <i class="bi bi-pencil"></i> Edit
-                                    </button>
-                                    <button type="button" class="btn btn-sm btn-danger"
-                                        onclick="if(confirm('Yakin hapus konten ini?')) { document.getElementById('delete-form-<?php echo $info['id']; ?>').submit(); }">
-                                        <i class="bi bi-trash"></i> Hapus
-                                    </button>
-                                </div>
-                                <form id="delete-form-<?php echo $info['id']; ?>" action="informasi.php" method="POST"
-                                    style="display: none;">
-                                    <input type="hidden" name="id" value="<?php echo $info['id']; ?>">
-                                    <input type="hidden" name="hapus" value="1">
-                                </form>
-                            </td>
-                        </tr>
-                        <?php endforeach; ?>
+                            <?php foreach ($info_data as $info) : ?>
+                                <tr>
+                                    <td class="text-center"><span
+                                            class="badge bg-secondary"><?php echo htmlspecialchars($info['urutan']); ?></span>
+                                    </td>
+                                    <td><?php echo htmlspecialchars($info['judul']); ?></td>
+                                    <td class="text-center">
+                                        <div class="btn-group" role="group">
+                                            <button type="button" class="btn btn-sm btn-warning" data-bs-toggle="modal"
+                                                data-bs-target="#modalEdit" data-id="<?php echo $info['id']; ?>"
+                                                data-judul="<?php echo htmlspecialchars($info['judul']); ?>"
+                                                data-konten="<?php echo htmlspecialchars($info['konten']); ?>"
+                                                data-urutan="<?php echo $info['urutan']; ?>">
+                                                <i class="bi bi-pencil"></i> Edit
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-danger"
+                                                onclick="if(confirm('Yakin hapus konten ini?')) { document.getElementById('delete-form-<?php echo $info['id']; ?>').submit(); }">
+                                                <i class="bi bi-trash"></i> Hapus
+                                            </button>
+                                        </div>
+                                        <form id="delete-form-<?php echo $info['id']; ?>" action="informasi.php" method="POST"
+                                            style="display: none;">
+                                            <input type="hidden" name="id" value="<?php echo $info['id']; ?>">
+                                            <input type="hidden" name="hapus" value="1">
+                                        </form>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
                         <?php endif; ?>
                     </tbody>
                 </table>
@@ -93,6 +96,7 @@ require_once 'templates/header.php';
         </div>
     </div>
 </div>
+<!-- End content wrapper -->
 
 <!-- Modal Tambah Informasi -->
 <div class="modal fade" id="modalTambah" tabindex="-1" aria-labelledby="modalTambahLabel" aria-hidden="true">
@@ -171,14 +175,14 @@ require_once 'templates/header.php';
 </div>
 
 <script>
-const modalEdit = document.getElementById('modalEdit');
-modalEdit.addEventListener('show.bs.modal', function(event) {
-    const button = event.relatedTarget;
-    document.getElementById('edit_id').value = button.getAttribute('data-id');
-    document.getElementById('judul_edit').value = button.getAttribute('data-judul');
-    document.getElementById('konten_edit').value = button.getAttribute('data-konten');
-    document.getElementById('urutan_edit').value = button.getAttribute('data-urutan');
-});
+    const modalEdit = document.getElementById('modalEdit');
+    modalEdit.addEventListener('show.bs.modal', function(event) {
+        const button = event.relatedTarget;
+        document.getElementById('edit_id').value = button.getAttribute('data-id');
+        document.getElementById('judul_edit').value = button.getAttribute('data-judul');
+        document.getElementById('konten_edit').value = button.getAttribute('data-konten');
+        document.getElementById('urutan_edit').value = button.getAttribute('data-urutan');
+    });
 </script>
 
-<?php require_once 'templates/footer.php'; ?>
+<?php require_once __DIR__ . '/../templates/admin/footer.php'; ?>

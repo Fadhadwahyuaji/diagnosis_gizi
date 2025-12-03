@@ -30,16 +30,17 @@ SET time_zone = "+00:00";
 CREATE TABLE `user` (
   `id` int(11) NOT NULL,
   `username` varchar(50) NOT NULL,
-  `password` varchar(255) NOT NULL
+  `password` varchar(255) NOT NULL,
+  `role` ENUM('admin', 'superadmin') NOT NULL DEFAULT 'admin'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data untuk tabel `user`
 --
 
-INSERT INTO `user` (`id`, `username`, `password`) VALUES
-(1, 'admin', '$2y$10$QastnfKJcQvq0c5hFxR.D.mQOVQnyEEKeHnj7YcpgNs1eNEMzgqWC'),
-(2, 'admin2', '12345');
+INSERT INTO `user` (`id`, `username`, `password`, `role`) VALUES
+(1, 'admin', '$2y$10$QastnfKJcQvq0c5hFxR.D.mQOVQnyEEKeHnj7YcpgNs1eNEMzgqWC', 'admin'),
+(2, 'admin2', '12345', 'superadmin');
 
 -- --------------------------------------------------------
 

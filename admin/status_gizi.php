@@ -1,6 +1,8 @@
 <?php
-require_once 'auth/auth_check.php';
-require_once '../config/databases.php';
+require_once __DIR__ . '/../auth/auth_check.php';
+require_once __DIR__ . '/../config/databases.php';
+require_once __DIR__ . '/../middleware/role_guard.php';
+requireAdmin();
 
 // Logika untuk menangani Aksi (Create, Update, Delete)
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -30,10 +32,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $stmt = $pdo->query("SELECT * FROM status_gizi ORDER BY kode_status ASC");
 $status_data = $stmt->fetchAll();
 
-require_once 'templates/header.php';
+require_once __DIR__ . '/../templates/admin/header.php';
 ?>
 
-<div class="container-fluid bg-white p-4" style="min-height: 100vh;">
+<!-- Content wrapper with proper spacing -->
+<div class="container-fluid p-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="text-dark">Manajemen Data Status Gizi</h2>
         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalTambah">
@@ -56,43 +59,43 @@ require_once 'templates/header.php';
                     </thead>
                     <tbody>
                         <?php if (empty($status_data)) : ?>
-                        <tr>
-                            <td colspan="5" class="text-center py-4 text-muted">
-                                <i class="bi bi-inbox" style="font-size: 2rem;"></i>
-                                <p class="mt-2">Tidak ada data</p>
-                            </td>
-                        </tr>
+                            <tr>
+                                <td colspan="5" class="text-center py-4 text-muted">
+                                    <i class="bi bi-inbox" style="font-size: 2rem;"></i>
+                                    <p class="mt-2">Tidak ada data</p>
+                                </td>
+                            </tr>
                         <?php else : ?>
-                        <?php foreach ($status_data as $index => $status) : ?>
-                        <tr>
-                            <td class="text-center"><?php echo $index + 1; ?></td>
-                            <td><span
-                                    class="badge bg-info"><?php echo htmlspecialchars($status['kode_status']); ?></span>
-                            </td>
-                            <td><?php echo htmlspecialchars($status['nama_status']); ?></td>
-                            <td><?php echo htmlspecialchars($status['deskripsi']); ?></td>
-                            <td class="text-center">
-                                <div class="btn-group" role="group">
-                                    <button type="button" class="btn btn-sm btn-warning" data-bs-toggle="modal"
-                                        data-bs-target="#modalEdit" data-id="<?php echo $status['id']; ?>"
-                                        data-kode="<?php echo htmlspecialchars($status['kode_status']); ?>"
-                                        data-nama="<?php echo htmlspecialchars($status['nama_status']); ?>"
-                                        data-deskripsi="<?php echo htmlspecialchars($status['deskripsi']); ?>">
-                                        <i class="bi bi-pencil"></i> Edit
-                                    </button>
-                                    <button type="button" class="btn btn-sm btn-danger"
-                                        onclick="if(confirm('Apakah Anda yakin ingin menghapus data ini?')) { document.getElementById('delete-form-<?php echo $status['id']; ?>').submit(); }">
-                                        <i class="bi bi-trash"></i> Hapus
-                                    </button>
-                                </div>
-                                <form id="delete-form-<?php echo $status['id']; ?>" action="status_gizi.php"
-                                    method="POST" style="display: none;">
-                                    <input type="hidden" name="id" value="<?php echo $status['id']; ?>">
-                                    <input type="hidden" name="hapus" value="1">
-                                </form>
-                            </td>
-                        </tr>
-                        <?php endforeach; ?>
+                            <?php foreach ($status_data as $index => $status) : ?>
+                                <tr>
+                                    <td class="text-center"><?php echo $index + 1; ?></td>
+                                    <td><span
+                                            class="badge bg-info"><?php echo htmlspecialchars($status['kode_status']); ?></span>
+                                    </td>
+                                    <td><?php echo htmlspecialchars($status['nama_status']); ?></td>
+                                    <td><?php echo htmlspecialchars($status['deskripsi']); ?></td>
+                                    <td class="text-center">
+                                        <div class="btn-group" role="group">
+                                            <button type="button" class="btn btn-sm btn-warning" data-bs-toggle="modal"
+                                                data-bs-target="#modalEdit" data-id="<?php echo $status['id']; ?>"
+                                                data-kode="<?php echo htmlspecialchars($status['kode_status']); ?>"
+                                                data-nama="<?php echo htmlspecialchars($status['nama_status']); ?>"
+                                                data-deskripsi="<?php echo htmlspecialchars($status['deskripsi']); ?>">
+                                                <i class="bi bi-pencil"></i> Edit
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-danger"
+                                                onclick="if(confirm('Apakah Anda yakin ingin menghapus data ini?')) { document.getElementById('delete-form-<?php echo $status['id']; ?>').submit(); }">
+                                                <i class="bi bi-trash"></i> Hapus
+                                            </button>
+                                        </div>
+                                        <form id="delete-form-<?php echo $status['id']; ?>" action="status_gizi.php"
+                                            method="POST" style="display: none;">
+                                            <input type="hidden" name="id" value="<?php echo $status['id']; ?>">
+                                            <input type="hidden" name="hapus" value="1">
+                                        </form>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
                         <?php endif; ?>
                     </tbody>
                 </table>
@@ -100,6 +103,7 @@ require_once 'templates/header.php';
         </div>
     </div>
 </div>
+<!-- End content wrapper -->
 
 <!-- Modal Tambah Status -->
 <div class="modal fade" id="modalTambah" tabindex="-1" aria-labelledby="modalTambahLabel" aria-hidden="true">
@@ -176,16 +180,16 @@ require_once 'templates/header.php';
 </div>
 
 <script>
-const modalEdit = document.getElementById('modalEdit');
-modalEdit.addEventListener('show.bs.modal', function(event) {
-    const button = event.relatedTarget;
-    document.getElementById('edit_id').value = button.getAttribute('data-id');
-    document.getElementById('kode_status_edit').value = button.getAttribute('data-kode');
-    document.getElementById('nama_status_edit').value = button.getAttribute('data-nama');
-    document.getElementById('deskripsi_edit').value = button.getAttribute('data-deskripsi');
-});
+    const modalEdit = document.getElementById('modalEdit');
+    modalEdit.addEventListener('show.bs.modal', function(event) {
+        const button = event.relatedTarget;
+        document.getElementById('edit_id').value = button.getAttribute('data-id');
+        document.getElementById('kode_status_edit').value = button.getAttribute('data-kode');
+        document.getElementById('nama_status_edit').value = button.getAttribute('data-nama');
+        document.getElementById('deskripsi_edit').value = button.getAttribute('data-deskripsi');
+    });
 </script>
 
 <?php
-require_once 'templates/footer.php';
+require_once __DIR__ . '/../templates/admin/footer.php';
 ?>

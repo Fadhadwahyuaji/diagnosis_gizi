@@ -1,4 +1,4 @@
-<?php require_once 'templates/header.php'; ?>
+<?php require_once 'templates/umum/header.php'; ?>
 
 <div class="p-5 mb-4 bg-white rounded-3 shadow-sm">
     <div class="container-fluid py-5 text-center">
@@ -11,4 +11,4 @@
     </div>
 </div>
 
-<?php require_once 'templates/footer.php'; ?>
+<?php require_once 'templates/umum/footer.php'; ?>

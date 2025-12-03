@@ -1,6 +1,6 @@
 <?php
 // filepath: d:\PROYEK\diagnosis_gizi\diagnosis.php
-require_once 'templates/header.php';
+require_once 'templates/umum/header.php';
 ?>
 
 <div class="card shadow-sm">
@@ -240,4 +240,4 @@ require_once 'templates/header.php';
     });
 </script>
 
-<?php require_once 'templates/footer.php'; ?>
+<?php require_once 'templates/umum/footer.php'; ?>

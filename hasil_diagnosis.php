@@ -3,7 +3,7 @@
 // session_start();
 
 // Panggil header
-require_once 'templates/header.php';
+require_once 'templates/umum/header.php';
 
 // Cek apakah ada hasil diagnosa di session. Jika tidak, redirect ke halaman diagnosis.
 if (!isset($_SESSION['hasil_diagnosa'])) {
@@ -183,5 +183,5 @@ if (isset($hasil['tinggi_badan'])) {
 
 <?php
 // Panggil footer
-require_once 'templates/footer.php';
+require_once 'templates/umum/footer.php';
 ?>

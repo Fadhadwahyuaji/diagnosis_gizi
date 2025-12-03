@@ -1,6 +1,8 @@
 <?php
-require_once 'auth/auth_check.php';
-require_once '../config/databases.php';
+require_once __DIR__ . '/../auth/auth_check.php';
+require_once __DIR__ . '/../config/databases.php';
+require_once __DIR__ . '/../middleware/role_guard.php';
+requireAdmin();
 
 // Logika untuk menangani Aksi (Create, Update, Delete)
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -30,10 +32,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $stmt = $pdo->query("SELECT * FROM gejala ORDER BY kode_gejala ASC");
 $gejala_data = $stmt->fetchAll();
 
-require_once 'templates/header.php';
+require_once __DIR__ . '/../templates/admin/header.php';
 ?>
 
-<div class="container-fluid bg-white p-4" style="min-height: 100vh;">
+<!-- Content wrapper with proper spacing -->
+<div class="container-fluid p-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="text-dark">Manajemen Data Gejala</h2>
         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalTambah">
@@ -55,41 +58,41 @@ require_once 'templates/header.php';
                     </thead>
                     <tbody>
                         <?php if (empty($gejala_data)) : ?>
-                        <tr>
-                            <td colspan="4" class="text-center py-4 text-muted">
-                                <i class="bi bi-inbox" style="font-size: 2rem;"></i>
-                                <p class="mt-2">Tidak ada data</p>
-                            </td>
-                        </tr>
+                            <tr>
+                                <td colspan="4" class="text-center py-4 text-muted">
+                                    <i class="bi bi-inbox" style="font-size: 2rem;"></i>
+                                    <p class="mt-2">Tidak ada data</p>
+                                </td>
+                            </tr>
                         <?php else : ?>
-                        <?php foreach ($gejala_data as $index => $gejala) : ?>
-                        <tr>
-                            <td class="text-center"><?php echo $index + 1; ?></td>
-                            <td><span
-                                    class="badge bg-secondary"><?php echo htmlspecialchars($gejala['kode_gejala']); ?></span>
-                            </td>
-                            <td><?php echo htmlspecialchars($gejala['nama_gejala']); ?></td>
-                            <td class="text-center">
-                                <div class="btn-group" role="group">
-                                    <button type="button" class="btn btn-sm btn-warning" data-bs-toggle="modal"
-                                        data-bs-target="#modalEdit" data-id="<?php echo $gejala['id']; ?>"
-                                        data-kode="<?php echo htmlspecialchars($gejala['kode_gejala']); ?>"
-                                        data-nama="<?php echo htmlspecialchars($gejala['nama_gejala']); ?>">
-                                        <i class="bi bi-pencil"></i> Edit
-                                    </button>
-                                    <button type="button" class="btn btn-sm btn-danger"
-                                        onclick="if(confirm('Apakah Anda yakin ingin menghapus data ini?')) { document.getElementById('delete-form-<?php echo $gejala['id']; ?>').submit(); }">
-                                        <i class="bi bi-trash"></i> Hapus
-                                    </button>
-                                </div>
-                                <form id="delete-form-<?php echo $gejala['id']; ?>" action="gejala.php" method="POST"
-                                    style="display: none;">
-                                    <input type="hidden" name="id" value="<?php echo $gejala['id']; ?>">
-                                    <input type="hidden" name="hapus" value="1">
-                                </form>
-                            </td>
-                        </tr>
-                        <?php endforeach; ?>
+                            <?php foreach ($gejala_data as $index => $gejala) : ?>
+                                <tr>
+                                    <td class="text-center"><?php echo $index + 1; ?></td>
+                                    <td><span
+                                            class="badge bg-secondary"><?php echo htmlspecialchars($gejala['kode_gejala']); ?></span>
+                                    </td>
+                                    <td><?php echo htmlspecialchars($gejala['nama_gejala']); ?></td>
+                                    <td class="text-center">
+                                        <div class="btn-group" role="group">
+                                            <button type="button" class="btn btn-sm btn-warning" data-bs-toggle="modal"
+                                                data-bs-target="#modalEdit" data-id="<?php echo $gejala['id']; ?>"
+                                                data-kode="<?php echo htmlspecialchars($gejala['kode_gejala']); ?>"
+                                                data-nama="<?php echo htmlspecialchars($gejala['nama_gejala']); ?>">
+                                                <i class="bi bi-pencil"></i> Edit
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-danger"
+                                                onclick="if(confirm('Apakah Anda yakin ingin menghapus data ini?')) { document.getElementById('delete-form-<?php echo $gejala['id']; ?>').submit(); }">
+                                                <i class="bi bi-trash"></i> Hapus
+                                            </button>
+                                        </div>
+                                        <form id="delete-form-<?php echo $gejala['id']; ?>" action="gejala.php" method="POST"
+                                            style="display: none;">
+                                            <input type="hidden" name="id" value="<?php echo $gejala['id']; ?>">
+                                            <input type="hidden" name="hapus" value="1">
+                                        </form>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
                         <?php endif; ?>
                     </tbody>
                 </table>
@@ -97,6 +100,7 @@ require_once 'templates/header.php';
         </div>
     </div>
 </div>
+<!-- End content wrapper -->
 
 <!-- Modal Tambah Gejala -->
 <div class="modal fade" id="modalTambah" tabindex="-1" aria-labelledby="modalTambahLabel" aria-hidden="true">
@@ -165,20 +169,20 @@ require_once 'templates/header.php';
 </div>
 
 <script>
-// Script untuk mengisi data ke modal edit
-const modalEdit = document.getElementById('modalEdit');
-modalEdit.addEventListener('show.bs.modal', function(event) {
-    const button = event.relatedTarget;
-    const id = button.getAttribute('data-id');
-    const kode = button.getAttribute('data-kode');
-    const nama = button.getAttribute('data-nama');
+    // Script untuk mengisi data ke modal edit
+    const modalEdit = document.getElementById('modalEdit');
+    modalEdit.addEventListener('show.bs.modal', function(event) {
+        const button = event.relatedTarget;
+        const id = button.getAttribute('data-id');
+        const kode = button.getAttribute('data-kode');
+        const nama = button.getAttribute('data-nama');
 
-    document.getElementById('edit_id').value = id;
-    document.getElementById('kode_gejala_edit').value = kode;
-    document.getElementById('nama_gejala_edit').value = nama;
-});
+        document.getElementById('edit_id').value = id;
+        document.getElementById('kode_gejala_edit').value = kode;
+        document.getElementById('nama_gejala_edit').value = nama;
+    });
 </script>
 
 <?php
-require_once 'templates/footer.php';
+require_once __DIR__ . '/../templates/admin/footer.php';
 ?>
