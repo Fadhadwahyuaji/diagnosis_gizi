@@ -358,21 +358,20 @@ try {
         $hasil_akhir_cf,
         $rekomendasi_lengkap
     ]);
-    
+
     // Ambil ID riwayat yang baru disimpan
     $riwayat_id = $pdo->lastInsertId();
-    
+
     // Simpan ID riwayat ke session untuk pengguna umum
     if (!isset($_SESSION['riwayat_pengguna'])) {
         $_SESSION['riwayat_pengguna'] = [];
     }
     $_SESSION['riwayat_pengguna'][] = $riwayat_id;
-    
+
     // Batasi maksimal 10 riwayat terakhir di session
     if (count($_SESSION['riwayat_pengguna']) > 10) {
         $_SESSION['riwayat_pengguna'] = array_slice($_SESSION['riwayat_pengguna'], -10);
     }
-    
 } catch (PDOException $e) {
     error_log("Error: " . $e->getMessage());
 }

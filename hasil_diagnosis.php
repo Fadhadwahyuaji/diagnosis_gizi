@@ -15,7 +15,7 @@ if (isset($_SESSION['hasil_diagnosa'])) {
 } elseif (isset($_GET['id'])) {
     // Jika tidak ada di session, coba ambil dari database berdasarkan ID
     $id = (int)$_GET['id'];
-    
+
     // Verifikasi bahwa ID ini ada di riwayat pengguna
     if (isset($_SESSION['riwayat_pengguna']) && in_array($id, $_SESSION['riwayat_pengguna'])) {
         try {
@@ -27,11 +27,11 @@ if (isset($_SESSION['hasil_diagnosa'])) {
             ");
             $stmt->execute([$id]);
             $riwayat = $stmt->fetch(PDO::FETCH_ASSOC);
-            
+
             if ($riwayat) {
                 // Rekonstruksi array hasil dari database
                 $gejala_list = json_decode($riwayat['data_gejala'], true) ?? [];
-                
+
                 // Parse rekomendasi dari text
                 $rekomendasi_list = [];
                 $rekomendasi_parts = explode("\n\n", $riwayat['rekomendasi_diberikan']);
@@ -47,7 +47,7 @@ if (isset($_SESSION['hasil_diagnosa'])) {
                         ];
                     }
                 }
-                
+
                 $hasil = [
                     'id' => $riwayat['id'],
                     'nama_lengkap' => $riwayat['nama_lengkap'],
@@ -204,7 +204,7 @@ if (isset($hasil['tinggi_badan'])) {
             </div>
         <?php endif; ?>
 
-        <hr class="my-4">        <!-- Tombol Aksi -->
+        <hr class="my-4"> <!-- Tombol Aksi -->
         <div class="text-center">
             <a href="diagnosis.php" class="btn btn-primary btn-lg me-2">
                 <i class="bi bi-arrow-left-circle"></i> Diagnosis Ulang
