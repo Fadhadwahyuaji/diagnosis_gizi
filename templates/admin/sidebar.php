@@ -104,7 +104,8 @@ $isSuperAdmin = ($role === 'superadmin');
                     <li><span class="dropdown-item-text fw-bold">
                             <!-- <?php echo htmlspecialchars($username); ?> -->
                             <?php echo htmlspecialchars(ucfirst($role)); ?>
-                        </span></li>                    <li>
+                        </span></li>
+                    <li>
                         <hr class="dropdown-divider">
                     </li>
                     <li>

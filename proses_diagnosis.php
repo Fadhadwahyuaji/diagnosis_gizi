@@ -338,12 +338,41 @@ foreach ($rekomendasi_list as $rek) {
 // =================================================================
 // SIMPAN KE DATABASE
 // =================================================================
+$riwayat_id = null;
 try {
+    // Simpan gejala sebagai JSON
+    $gejala_json = json_encode($gejala_detail, JSON_UNESCAPED_UNICODE);
+
     $stmt = $pdo->prepare("
-        INSERT INTO riwayat_diagnosa (nama_lengkap, hasil_status_gizi_id, hasil_cf, rekomendasi_diberikan) 
-        VALUES (?, ?, ?, ?)
+        INSERT INTO riwayat_diagnosa 
+        (nama_lengkap, berat_badan, tinggi_badan, imt, data_gejala, hasil_status_gizi_id, hasil_cf, rekomendasi_diberikan) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     ");
-    $stmt->execute([$nama_lengkap, $hasil_akhir_id, $hasil_akhir_cf, $rekomendasi_lengkap]);
+    $stmt->execute([
+        $nama_lengkap,
+        $berat_badan,
+        $tinggi_badan_cm,
+        $imt,
+        $gejala_json,
+        $hasil_akhir_id,
+        $hasil_akhir_cf,
+        $rekomendasi_lengkap
+    ]);
+    
+    // Ambil ID riwayat yang baru disimpan
+    $riwayat_id = $pdo->lastInsertId();
+    
+    // Simpan ID riwayat ke session untuk pengguna umum
+    if (!isset($_SESSION['riwayat_pengguna'])) {
+        $_SESSION['riwayat_pengguna'] = [];
+    }
+    $_SESSION['riwayat_pengguna'][] = $riwayat_id;
+    
+    // Batasi maksimal 10 riwayat terakhir di session
+    if (count($_SESSION['riwayat_pengguna']) > 10) {
+        $_SESSION['riwayat_pengguna'] = array_slice($_SESSION['riwayat_pengguna'], -10);
+    }
+    
 } catch (PDOException $e) {
     error_log("Error: " . $e->getMessage());
 }
@@ -352,6 +381,7 @@ try {
 // KIRIM KE HALAMAN HASIL
 // =================================================================
 $_SESSION['hasil_diagnosa'] = [
+    'id' => $riwayat_id,  // Tambahkan ID untuk referensi
     'nama_lengkap' => $nama_lengkap,
     'berat_badan' => $berat_badan,
     'tinggi_badan' => $tinggi_badan_cm,

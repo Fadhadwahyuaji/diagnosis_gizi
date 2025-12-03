@@ -42,10 +42,14 @@ $user_role = $_SESSION['user_role'] ?? '';
                         <a class="nav-link" href="index.php">
                             <i class="bi bi-house me-1"></i>Beranda
                         </a>
-                    </li>
-                    <li class="nav-item">
+                    </li>                    <li class="nav-item">
                         <a class="nav-link" href="diagnosis.php">
                             <i class="bi bi-clipboard-pulse me-1"></i>Mulai Diagnosis
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="riwayat_saya.php">
+                            <i class="bi bi-clock-history me-1"></i>Riwayat Saya
                         </a>
                     </li>
                     <li class="nav-item dropdown">

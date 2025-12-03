@@ -43,7 +43,7 @@ require_once __DIR__ . '/../templates/admin/header.php';
                             <th style="width: 150px;">Hasil Status Gizi</th>
                             <th class="text-center" style="width: 120px;">Nilai Keyakinan (CF)</th>
                             <th>Rekomendasi Diberikan</th>
-                            <th class="text-center" style="width: 100px;">Aksi</th>
+                            <th class="text-center" style="width: 150px;">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -69,6 +69,11 @@ require_once __DIR__ . '/../templates/admin/header.php';
                                     </td>
                                     <td><?php echo nl2br(htmlspecialchars($riwayat['rekomendasi_diberikan'])); ?></td>
                                     <td class="text-center">
+                                        <a href="detail_riwayat.php?id=<?php echo $riwayat['id']; ?>"
+                                            class="btn btn-sm btn-info me-1"
+                                            title="Lihat Detail">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
                                         <button type="button" class="btn btn-sm btn-danger"
                                             onclick="if(confirm('Yakin hapus riwayat ini?')) { document.getElementById('delete-form-<?php echo $riwayat['id']; ?>').submit(); }">
                                             <i class="bi bi-trash"></i>

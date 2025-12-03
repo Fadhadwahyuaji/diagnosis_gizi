@@ -4,18 +4,73 @@
 
 // Panggil header
 require_once 'templates/umum/header.php';
+require_once 'config/databases.php';
 
-// Cek apakah ada hasil diagnosa di session. Jika tidak, redirect ke halaman diagnosis.
-if (!isset($_SESSION['hasil_diagnosa'])) {
+// Cek apakah ada hasil diagnosa di session atau parameter ID
+$hasil = null;
+
+if (isset($_SESSION['hasil_diagnosa'])) {
+    // Ambil dari session jika ada
+    $hasil = $_SESSION['hasil_diagnosa'];
+} elseif (isset($_GET['id'])) {
+    // Jika tidak ada di session, coba ambil dari database berdasarkan ID
+    $id = (int)$_GET['id'];
+    
+    // Verifikasi bahwa ID ini ada di riwayat pengguna
+    if (isset($_SESSION['riwayat_pengguna']) && in_array($id, $_SESSION['riwayat_pengguna'])) {
+        try {
+            $stmt = $pdo->prepare("
+                SELECT r.*, s.nama_status
+                FROM riwayat_diagnosa r
+                JOIN status_gizi s ON r.hasil_status_gizi_id = s.id
+                WHERE r.id = ?
+            ");
+            $stmt->execute([$id]);
+            $riwayat = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            if ($riwayat) {
+                // Rekonstruksi array hasil dari database
+                $gejala_list = json_decode($riwayat['data_gejala'], true) ?? [];
+                
+                // Parse rekomendasi dari text
+                $rekomendasi_list = [];
+                $rekomendasi_parts = explode("\n\n", $riwayat['rekomendasi_diberikan']);
+                foreach ($rekomendasi_parts as $part) {
+                    if (strpos($part, '===') !== false) {
+                        $lines = explode("\n", $part);
+                        $judul = trim(str_replace('===', '', $lines[0]));
+                        $isi = implode("\n", array_slice($lines, 1));
+                        $rekomendasi_list[] = [
+                            'judul' => $judul,
+                            'isi' => trim($isi),
+                            'icon' => 'clipboard-heart'
+                        ];
+                    }
+                }
+                
+                $hasil = [
+                    'id' => $riwayat['id'],
+                    'nama_lengkap' => $riwayat['nama_lengkap'],
+                    'berat_badan' => $riwayat['berat_badan'],
+                    'tinggi_badan' => $riwayat['tinggi_badan'],
+                    'imt' => $riwayat['imt'],
+                    'status' => $riwayat['nama_status'],
+                    'cf' => $riwayat['hasil_cf'],
+                    'gejala_terdeteksi' => $gejala_list,
+                    'rekomendasi_list' => $rekomendasi_list,
+                ];
+            }
+        } catch (PDOException $e) {
+            error_log("Error: " . $e->getMessage());
+        }
+    }
+}
+
+// Jika tidak ada hasil, redirect ke diagnosis
+if (!$hasil) {
     header('Location: diagnosis.php');
     exit();
 }
-
-// Ambil data hasil dari session
-$hasil = $_SESSION['hasil_diagnosa'];
-
-// Hapus data dari session setelah diambil agar tidak tampil lagi jika halaman di-refresh
-unset($_SESSION['hasil_diagnosa']);
 
 $bb_ideal = 0;
 if (isset($hasil['tinggi_badan'])) {
@@ -149,12 +204,13 @@ if (isset($hasil['tinggi_badan'])) {
             </div>
         <?php endif; ?>
 
-        <hr class="my-4">
-
-        <!-- Tombol Aksi -->
+        <hr class="my-4">        <!-- Tombol Aksi -->
         <div class="text-center">
             <a href="diagnosis.php" class="btn btn-primary btn-lg me-2">
                 <i class="bi bi-arrow-left-circle"></i> Diagnosis Ulang
+            </a>
+            <a href="riwayat_saya.php" class="btn btn-outline-info btn-lg me-2">
+                <i class="bi bi-clock-history"></i> Lihat Riwayat
             </a>
             <button onclick="window.print()" class="btn btn-outline-secondary btn-lg">
                 <i class="bi bi-printer"></i> Cetak Hasil
